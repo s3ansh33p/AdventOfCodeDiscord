@@ -1,15 +1,24 @@
 package bot
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+
+	"dustin-ward/AdventOfCodeBot/data"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 var s *discordgo.Session
+var c []data.Channel
 
 var commands = []*discordgo.ApplicationCommand{
+	{
+		Name:        "hello-world",
+		Description: "For testing purposes",
+	},
 	{
 		Name:        "leaderboard",
 		Description: "Current Leaderboard",
@@ -23,7 +32,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 func InitSession() (*discordgo.Session, error) {
 	S, err := discordgo.New("Bot " + BotToken)
 	if err != nil {
-		return nil, fmt.Errorf("invalid bot configuration: %v", err)
+		return nil, fmt.Errorf("invalid bot configuration: %w", err)
 	}
 
 	S.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -34,6 +43,15 @@ func InitSession() (*discordgo.Session, error) {
 		}
 	})
 
+	b, err := ioutil.ReadFile("./channels.json")
+	if err != nil {
+		return nil, err
+	}
+
+	if err = json.Unmarshal(b, &c); err != nil {
+		return nil, err
+	}
+
 	s = S
 	return S, nil
 }
@@ -43,7 +61,7 @@ func RegisterCommands() ([]*discordgo.ApplicationCommand, error) {
 	for i, v := range commands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, "", v)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot create '%v' command: %v", v.Name, err)
+			return nil, fmt.Errorf("Cannot create '%s' command: %w", v.Name, err)
 		}
 		registeredCommands[i] = cmd
 	}

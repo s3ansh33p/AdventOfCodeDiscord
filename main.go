@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"dustin-ward/AdventOfCodeBot/bot"
-	"dustin-ward/AdventOfCodeBot/data"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -31,12 +30,12 @@ func main() {
 	if len(os.Args) != 2 {
 		log.Fatal("Fatal: invalid number of arguments")
 	}
-	boardId := os.Args[1]
+	// boardId := os.Args[1]
 
 	// Initialize Discord Session
 	Session, err := bot.InitSession()
 	if err != nil {
-		log.Fatal(fmt.Errorf("Fatal: %v", err))
+		log.Fatal(fmt.Errorf("Fatal: %w", err))
 	}
 
 	log.Println("Session initialized")
@@ -48,31 +47,31 @@ func main() {
 
 	// Open connection
 	if err = Session.Open(); err != nil {
-		log.Fatal(fmt.Errorf("Fatal: %v", err))
+		log.Fatal(fmt.Errorf("Fatal: %w", err))
 	}
 	defer Session.Close()
 
 	// Register commands
 	r, err := bot.RegisterCommands()
 	if err != nil {
-		log.Fatal(fmt.Errorf("Fatal: %v", err))
+		log.Fatal(fmt.Errorf("Fatal: %w", err))
 	}
 	for _, c := range r {
 		log.Printf("Command registered: \"%s\" with id: %v", c.Name, c.ID)
 	}
 
 	// Continually fetch advent of code data every 15 minutes
-	go func() {
-		for {
-			log.Println("Attempting to fetch data for leaderboard " + boardId + "...")
-			if err := data.FetchData(boardId, boardId); err != nil {
-				log.Fatal(fmt.Errorf("Fatal: %v", err))
-			}
-			log.Println("Success!")
+	// go func() {
+	// 	for {
+	// 		log.Println("Attempting to fetch data for leaderboard " + boardId + "...")
+	// 		if err := data.FetchData(boardId, boardId); err != nil {
+	// 			log.Fatal(fmt.Errorf("Fatal: %w", err))
+	// 		}
+	// 		log.Println("Success!")
 
-			time.Sleep(REQUEST_RATE)
-		}
-	}()
+	// 		time.Sleep(REQUEST_RATE)
+	// 	}
+	// }()
 
 	// Wait for SIGINT to end program
 	stop := make(chan os.Signal, 1)

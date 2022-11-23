@@ -1,5 +1,11 @@
 package data
 
+type Channel struct {
+	GuildId     string `json:"guildId"`
+	ChannelId   string `json:"channelId"`
+	Leaderboard string `json:"leaderboard"`
+}
+
 type Data struct {
 	Event   string          `json:"event"`
 	OwnerID int32           `json:"owner_id"`

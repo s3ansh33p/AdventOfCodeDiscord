@@ -1,20 +1,30 @@
 package data
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 )
 
 const (
-	AocURL = "https://adventofcode.com/2022/leaderboard/"
+	AocURL = "https://adventofcode.com/2021/leaderboard/private/view/"
 )
 
-func GetData(boardId string) ([]byte, error) {
-	return ioutil.ReadFile("./" + boardId + ".json")
+func GetData(boardId string) (*Data, error) {
+	b, err := ioutil.ReadFile("./" + boardId + ".json")
+	if err != nil {
+		return nil, err
+	}
+
+	var D Data
+	if err = json.Unmarshal(b, &D); err != nil {
+		return nil, err
+	}
+	return &D, nil
 }
 
 func FetchData(boardId, writePath string) error {
-	req, err := http.NewRequest("GET", AocURL+boardId, nil)
+	req, err := http.NewRequest("GET", AocURL+boardId+".json", nil)
 	if err != nil {
 		return err
 	}
