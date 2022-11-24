@@ -46,6 +46,10 @@ func main() {
 		log.Printf("Command registered: \"%s\" with id: %v", c.Name, c.ID)
 	}
 
+	if err = bot.SetupNotifications(); err != nil {
+		log.Println("Error: unable to send notification: %w", err)
+	}
+
 	// Continually fetch advent of code data every 15 minutes
 	for _, ch := range bot.C {
 		go func(channel data.Channel) {

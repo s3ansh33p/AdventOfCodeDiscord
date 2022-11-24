@@ -9,10 +9,12 @@ import (
 	"dustin-ward/AdventOfCodeBot/data"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/robfig/cron"
 )
 
 var s *discordgo.Session
 var C map[string]data.Channel
+var crn *cron.Cron
 var adminPerm int64 = 0
 
 var commands = []*discordgo.ApplicationCommand{
@@ -101,4 +103,13 @@ func RegisterCommands() ([]*discordgo.ApplicationCommand, error) {
 		registeredCommands[i] = cmd
 	}
 	return registeredCommands, nil
+}
+
+func SetupNotifications() error {
+	crn = cron.New()
+	if err := crn.AddFunc("0 * * * * *", problemNotification); err != nil {
+		return err
+	}
+	crn.Start()
+	return nil
 }
