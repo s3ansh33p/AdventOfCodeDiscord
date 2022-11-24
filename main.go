@@ -24,7 +24,7 @@ func main() {
 		log.Fatal(fmt.Errorf("Fatal: %w", err))
 	}
 
-	log.Println("Session initialized")
+	log.Println("Session initialized for", len(bot.C), "servers")
 
 	// Add init handler
 	Session.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
@@ -48,18 +48,18 @@ func main() {
 
 	// Continually fetch advent of code data every 15 minutes
 	for _, ch := range bot.C {
-		go func() {
+		go func(channel data.Channel) {
 			for {
-				log.Println("Attempting to fetch data for leaderboard " + ch.Leaderboard + "...")
-				if err := data.FetchData(ch.Leaderboard, ch.SessionToken, ch.Leaderboard); err != nil {
+				log.Println("Attempting to fetch data for leaderboard " + channel.Leaderboard + "...")
+				if err := data.FetchData(channel.Leaderboard, channel.SessionToken, channel.Leaderboard); err != nil {
 					log.Println(fmt.Errorf("Error: %w", err))
 				} else {
-					log.Println("Success!")
+					log.Println(channel.Leaderboard, "success!")
 				}
 
 				time.Sleep(REQUEST_RATE)
 			}
-		}()
+		}(ch)
 	}
 
 	// Wait for SIGINT to end program
