@@ -2,7 +2,9 @@ package bot
 
 import (
 	"dustin-ward/AdventOfCodeBot/data"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"sort"
 	"time"
@@ -11,10 +13,11 @@ import (
 )
 
 func helloworld(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	log.Printf("Info: command \"helloworld\" executed from guildId: %s", i.GuildID)
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Hey there! Congratulations, you just executed your first slash command",
+			Content: "Hello from the AoC bot 🙂",
 		},
 	})
 }
@@ -76,6 +79,47 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Embeds: embeds,
+		},
+	})
+	if err != nil {
+		log.Println(fmt.Errorf("Warn: %w", err))
+	}
+}
+
+func configure(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	log.Printf("Info: command \"configure\" executed from guildId: %s", i.GuildID)
+	options := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(i.ApplicationCommandData().Options))
+	for _, opt := range i.ApplicationCommandData().Options {
+		options[opt.Name] = opt
+	}
+
+	ch := data.Channel{
+		GuildId:      i.GuildID,
+		ChannelId:    options["channel"].ChannelValue(nil).ID,
+		RoleId:       options["role"].RoleValue(nil, i.GuildID).ID,
+		Leaderboard:  options["leaderboard"].StringValue(),
+		SessionToken: options["session-token"].StringValue(),
+	}
+
+	C[i.GuildID] = ch
+
+	b, err := json.Marshal(C)
+	if err != nil {
+		log.Println(fmt.Errorf("Error: configure: %v", err))
+		respondWithError(s, i, "Error: Invalid arguments were supplied...")
+		return
+	}
+
+	if err := ioutil.WriteFile("./channels.json", b, 0777); err != nil {
+		log.Println(fmt.Errorf("Error: configure: %v", err))
+		respondWithError(s, i, "Error: Internal server error...")
+		return
+	}
+
+	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Server successfully configured!",
 		},
 	})
 	if err != nil {

@@ -12,21 +12,56 @@ import (
 )
 
 var s *discordgo.Session
-var c []data.Channel
+var C map[string]data.Channel
+var adminPerm int64 = 0
 
 var commands = []*discordgo.ApplicationCommand{
 	{
-		Name:        "hello-world",
-		Description: "For testing purposes",
+		Name:                     "hello-world",
+		Description:              "For testing purposes",
+		DefaultMemberPermissions: &adminPerm,
 	},
 	{
 		Name:        "leaderboard",
 		Description: "Current Leaderboard",
 	},
+	{
+		Name:                     "configure-server",
+		Description:              "Configure the AdventOfCode bot to work with your leaderboard and server",
+		DefaultMemberPermissions: &adminPerm,
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionChannel,
+				Name:        "channel",
+				Description: "Channel to post in",
+				Required:    true,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionRole,
+				Name:        "role",
+				Description: "Advent of Code role to be pinged",
+				Required:    true,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "leaderboard",
+				Description: "Id for your private Advent of Code leaderboard",
+				Required:    true,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "session-token",
+				Description: "Valid session token of one member of your private leaderboard",
+				Required:    true,
+			},
+		},
+	},
 }
 
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-	"leaderboard": leaderboard,
+	"leaderboard":      leaderboard,
+	"hello-world":      helloworld,
+	"configure-server": configure,
 }
 
 func InitSession() (*discordgo.Session, error) {
@@ -48,7 +83,7 @@ func InitSession() (*discordgo.Session, error) {
 		return nil, err
 	}
 
-	if err = json.Unmarshal(b, &c); err != nil {
+	if err = json.Unmarshal(b, &C); err != nil {
 		return nil, err
 	}
 

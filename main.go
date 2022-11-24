@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"dustin-ward/AdventOfCodeBot/bot"
+	"dustin-ward/AdventOfCodeBot/data"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -17,21 +18,6 @@ const (
 )
 
 func main() {
-	// resBody, err := data.GetData(data.Jenna2021)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// if err := json.Unmarshal(resBody, &D); err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// Leaderboard ID from args
-	if len(os.Args) != 2 {
-		log.Fatal("Fatal: invalid number of arguments")
-	}
-	// boardId := os.Args[1]
-
 	// Initialize Discord Session
 	Session, err := bot.InitSession()
 	if err != nil {
@@ -61,17 +47,20 @@ func main() {
 	}
 
 	// Continually fetch advent of code data every 15 minutes
-	// go func() {
-	// 	for {
-	// 		log.Println("Attempting to fetch data for leaderboard " + boardId + "...")
-	// 		if err := data.FetchData(boardId, boardId); err != nil {
-	// 			log.Fatal(fmt.Errorf("Fatal: %w", err))
-	// 		}
-	// 		log.Println("Success!")
+	for _, ch := range bot.C {
+		go func() {
+			for {
+				log.Println("Attempting to fetch data for leaderboard " + ch.Leaderboard + "...")
+				if err := data.FetchData(ch.Leaderboard, ch.SessionToken, ch.Leaderboard); err != nil {
+					log.Println(fmt.Errorf("Error: %w", err))
+				} else {
+					log.Println("Success!")
+				}
 
-	// 		time.Sleep(REQUEST_RATE)
-	// 	}
-	// }()
+				time.Sleep(REQUEST_RATE)
+			}
+		}()
+	}
 
 	// Wait for SIGINT to end program
 	stop := make(chan os.Signal, 1)

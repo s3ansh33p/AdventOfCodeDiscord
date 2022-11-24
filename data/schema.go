@@ -1,9 +1,11 @@
 package data
 
 type Channel struct {
-	GuildId     string `json:"guildId"`
-	ChannelId   string `json:"channelId"`
-	Leaderboard string `json:"leaderboard"`
+	GuildId      string `json:"guildId"`
+	ChannelId    string `json:"channelId"`
+	RoleId       string `json:"roleId"`
+	Leaderboard  string `json:"leaderboard"`
+	SessionToken string `json:"token"`
 }
 
 type Data struct {

@@ -9,12 +9,11 @@ import (
 )
 
 func getChannel(guildId string) (*data.Channel, error) {
-	for _, ch := range c {
-		if ch.GuildId == guildId {
-			return &ch, nil
-		}
+	ch, ok := C[guildId]
+	if !ok {
+		return nil, fmt.Errorf("Error: channel not found")
 	}
-	return nil, fmt.Errorf("Error: channel not found")
+	return &ch, nil
 }
 
 func respondWithError(s *discordgo.Session, i *discordgo.InteractionCreate, message string) {

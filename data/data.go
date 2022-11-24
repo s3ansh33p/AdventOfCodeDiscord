@@ -2,12 +2,13 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
 const (
-	AocURL = "https://adventofcode.com/2021/leaderboard/private/view/"
+	AocURL = "https://adventofcode.com/2022/leaderboard/private/view/"
 )
 
 func GetData(boardId string) (*Data, error) {
@@ -23,16 +24,20 @@ func GetData(boardId string) (*Data, error) {
 	return &D, nil
 }
 
-func FetchData(boardId, writePath string) error {
+func FetchData(boardId, sessionToken, writePath string) error {
 	req, err := http.NewRequest("GET", AocURL+boardId+".json", nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("Cookie", "session="+AocToken)
+	req.Header.Add("Cookie", "session="+sessionToken)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
+	}
+
+	if res.StatusCode >= 400 {
+		return fmt.Errorf("error fetching data from leaderboard: %s", boardId)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
