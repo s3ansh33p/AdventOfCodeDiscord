@@ -3,8 +3,8 @@ package bot
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"dustin-ward/AdventOfCodeBot/data"
 
@@ -13,10 +13,11 @@ import (
 )
 
 var s *discordgo.Session
-var C map[string]data.Channel
+var C *map[string]*data.Channel
 var crn *cron.Cron
 var adminPerm int64 = 0
 
+// Command definitions
 var commands = []*discordgo.ApplicationCommand{
 	{
 		Name:                     "hello-world",
@@ -58,20 +59,41 @@ var commands = []*discordgo.ApplicationCommand{
 			},
 		},
 	},
+	{
+		Name:                     "start-notifications",
+		Description:              "Start the notification process",
+		DefaultMemberPermissions: &adminPerm,
+	},
+	{
+		Name:                     "stop-notifications",
+		Description:              "Stop the notification process",
+		DefaultMemberPermissions: &adminPerm,
+	},
+	{
+		Name:                     "check-notifications",
+		Description:              "Check to see if notificatiosn are currently enabled",
+		DefaultMemberPermissions: &adminPerm,
+	},
 }
 
+// Command handlefuncs
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-	"leaderboard":      leaderboard,
-	"hello-world":      helloworld,
-	"configure-server": configure,
+	"leaderboard":         leaderboard,
+	"hello-world":         helloworld,
+	"configure-server":    configure,
+	"start-notifications": startCountdown,
+	"stop-notifications":  stopCountdown,
+	"check-notifications": checkCountdown,
 }
 
 func InitSession() (*discordgo.Session, error) {
+	// Init discordgo session
 	S, err := discordgo.New("Bot " + BotToken)
 	if err != nil {
 		return nil, fmt.Errorf("invalid bot configuration: %w", err)
 	}
 
+	// Attach handlers to functions
 	S.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
@@ -80,11 +102,13 @@ func InitSession() (*discordgo.Session, error) {
 		}
 	})
 
-	b, err := ioutil.ReadFile("./channels.json")
+	// Read channel configs from file (Not an ideal storage method...)
+	b, err := os.ReadFile("./channels.json")
 	if err != nil {
 		return nil, err
 	}
 
+	// Populate channel info in local memory
 	if err = json.Unmarshal(b, &C); err != nil {
 		return nil, err
 	}
@@ -93,12 +117,27 @@ func InitSession() (*discordgo.Session, error) {
 	return S, nil
 }
 
+func TakeDown() error {
+	crn.Stop()
+
+	// Save channel configurations
+	b, err := json.Marshal(C)
+	if err != nil {
+		return err
+	}
+	if err = os.WriteFile("./channels.json", b, 0777); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func RegisterCommands() ([]*discordgo.ApplicationCommand, error) {
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
 	for i, v := range commands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, "", v)
 		if err != nil {
-			return nil, fmt.Errorf("Cannot create '%s' command: %w", v.Name, err)
+			return nil, fmt.Errorf("cannot create '%s' command: %w", v.Name, err)
 		}
 		registeredCommands[i] = cmd
 	}
@@ -107,7 +146,9 @@ func RegisterCommands() ([]*discordgo.ApplicationCommand, error) {
 
 func SetupNotifications() error {
 	crn = cron.New()
-	if err := crn.AddFunc("0 * * * * *", problemNotification); err != nil {
+
+	// Cronjob for 4:30am UTC (11:30pm EST)
+	if err := crn.AddFunc("0 30 4 * * *", problemNotification); err != nil {
 		return err
 	}
 	crn.Start()

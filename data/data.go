@@ -3,8 +3,9 @@ package data
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 )
 
 func GetData(boardId string) (*Data, error) {
-	b, err := ioutil.ReadFile("./" + boardId + ".json")
+	b, err := os.ReadFile("./" + boardId + ".json")
 	if err != nil {
 		return nil, err
 	}
@@ -25,27 +26,30 @@ func GetData(boardId string) (*Data, error) {
 }
 
 func FetchData(boardId, sessionToken, writePath string) error {
+	// Form request to adventofcode API
 	req, err := http.NewRequest("GET", AocURL+boardId+".json", nil)
 	if err != nil {
 		return err
 	}
 
+	// Add session token
 	req.Header.Add("Cookie", "session="+sessionToken)
+
+	// Make request
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
-
 	if res.StatusCode >= 400 {
 		return fmt.Errorf("error fetching data from leaderboard: %s", boardId)
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	// Write data to file
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
-
-	if err = ioutil.WriteFile(writePath+".json", body, 0777); err != nil {
+	if err = os.WriteFile(writePath+".json", body, 0777); err != nil {
 		return err
 	}
 

@@ -9,11 +9,23 @@ import (
 )
 
 func getChannel(guildId string) (*data.Channel, error) {
-	ch, ok := C[guildId]
+	ch, ok := (*C)[guildId]
 	if !ok {
-		return nil, fmt.Errorf("Error: channel not found")
+		return nil, fmt.Errorf("channel not found")
 	}
-	return &ch, nil
+	return ch, nil
+}
+
+func respond(s *discordgo.Session, i *discordgo.InteractionCreate, message string) {
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: message,
+		},
+	})
+	if err != nil {
+		log.Println("Warn:", fmt.Errorf("stop-notifications: %w", err))
+	}
 }
 
 func respondWithError(s *discordgo.Session, i *discordgo.InteractionCreate, message string) {
@@ -25,6 +37,6 @@ func respondWithError(s *discordgo.Session, i *discordgo.InteractionCreate, mess
 	})
 
 	if err != nil {
-		log.Fatal(fmt.Errorf("Fatal: %v", err))
+		log.Fatal("Fatal:", fmt.Errorf("respondWithError: %v", err))
 	}
 }

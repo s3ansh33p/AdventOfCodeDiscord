@@ -4,8 +4,8 @@ import (
 	"dustin-ward/AdventOfCodeBot/data"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"sort"
 	"time"
 
@@ -14,36 +14,34 @@ import (
 
 func helloworld(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	log.Printf("Info: command \"helloworld\" executed from guildId: %s", i.GuildID)
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: "Hello from the AoC bot 🙂",
-		},
-	})
+
+	respond(s, i, "Hello from the AoC bot 🙂")
 }
 
 func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	log.Printf("Info: command \"leaderboard\" executed from guildId: %s", i.GuildID)
 
+	// Get calling channel
 	channel, err := getChannel(i.GuildID)
 	if err != nil {
-		log.Println(fmt.Errorf("Error: leaderboard: %v", err))
+		log.Println("Error:", fmt.Errorf("leaderboard: %v", err))
 		respondWithError(s, i, "Your server has not been correctly configured!")
 		return
 	}
 
+	// Get leaderboard data for channel
 	D, err := data.GetData(channel.Leaderboard)
 	if err != nil {
-		log.Println(fmt.Errorf("Error: leaderboard: %v", err))
+		log.Println("Error:", fmt.Errorf("leaderboard: %v", err))
 		respondWithError(s, i, "An internal error occured...")
 		return
 	}
 
+	// Sort users by stars and localscore
 	M := make([]data.User, 0)
 	for _, m := range D.Members {
 		M = append(M, m)
 	}
-
 	sort.Slice(M, func(i, j int) bool {
 		if M[i].Stars == M[j].Stars {
 			return M[i].LocalScore > M[j].LocalScore
@@ -51,6 +49,7 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return M[i].Stars > M[j].Stars
 	})
 
+	// Add users to embed
 	fields := make([]*discordgo.MessageEmbedField, 0)
 	for _, m := range M {
 		f := &discordgo.MessageEmbedField{
@@ -63,6 +62,7 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	fields[1].Name += " 🥈"
 	fields[2].Name += " 🥉"
 
+	// Create embed object
 	embeds := make([]*discordgo.MessageEmbed, 1)
 	embeds[0] = &discordgo.MessageEmbed{
 		URL:   "https://adventofcode.com/2022/private/view/" + channel.Leaderboard,
@@ -75,6 +75,7 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		Fields: fields,
 	}
 
+	// Send embed to channel
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
@@ -82,47 +83,88 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		},
 	})
 	if err != nil {
-		log.Println(fmt.Errorf("Warn: %w", err))
+		log.Println("Warn:", fmt.Errorf("leaderboard: %w", err))
 	}
 }
 
 func configure(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	log.Printf("Info: command \"configure\" executed from guildId: %s", i.GuildID)
+
+	// Grab command options from user
 	options := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(i.ApplicationCommandData().Options))
 	for _, opt := range i.ApplicationCommandData().Options {
 		options[opt.Name] = opt
 	}
 
+	// Create new channel object
 	ch := data.Channel{
-		GuildId:      i.GuildID,
-		ChannelId:    options["channel"].ChannelValue(nil).ID,
-		RoleId:       options["role"].RoleValue(nil, i.GuildID).ID,
-		Leaderboard:  options["leaderboard"].StringValue(),
-		SessionToken: options["session-token"].StringValue(),
+		GuildId:         i.GuildID,
+		ChannelId:       options["channel"].ChannelValue(nil).ID,
+		RoleId:          options["role"].RoleValue(nil, i.GuildID).ID,
+		Leaderboard:     options["leaderboard"].StringValue(),
+		SessionToken:    options["session-token"].StringValue(),
+		NotificationsOn: false,
 	}
 
-	C[i.GuildID] = ch
+	// Add to local memory
+	(*C)[i.GuildID] = &ch
 
+	// Write to file
 	b, err := json.Marshal(C)
 	if err != nil {
-		log.Println(fmt.Errorf("Error: configure: %v", err))
+		log.Println("Error:", fmt.Errorf("configure: %v", err))
 		respondWithError(s, i, "Error: Invalid arguments were supplied...")
 		return
 	}
 
-	if err := ioutil.WriteFile("./channels.json", b, 0777); err != nil {
-		log.Println(fmt.Errorf("Error: configure: %v", err))
+	if err := os.WriteFile("./channels.json", b, 0777); err != nil {
+		log.Println("Error:", fmt.Errorf("configure: %v", err))
 		respondWithError(s, i, "Error: Internal server error...")
 		return
 	}
 
-	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: "Server successfully configured!",
-		},
-	})
+	respond(s, i, "Server successfully configured!")
+}
+
+func startCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	log.Printf("Info: command \"start-notifications\" executed from guildId: %s", i.GuildID)
+
+	ch, err := getChannel(i.GuildID)
 	if err != nil {
-		log.Println(fmt.Errorf("Warn: %w", err))
+		log.Println("Error:", fmt.Errorf("start-notifications: %v", err))
+		respondWithError(s, i, "Error: Internal server error...")
 	}
+	ch.NotificationsOn = true
+
+	respond(s, i, "Notification process started! ⏰")
+}
+
+func stopCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	log.Printf("Info: command \"stop-notifications\" executed from guildId: %s", i.GuildID)
+
+	ch, err := getChannel(i.GuildID)
+	if err != nil {
+		log.Println("Error:", fmt.Errorf("start-notifications: %v", err))
+		respondWithError(s, i, "Error: Internal server error...")
+	}
+	ch.NotificationsOn = false
+
+	respond(s, i, "Notification process stopped! ⏸")
+}
+
+func checkCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	log.Printf("Info: command \"check-notifications\" executed from guildId: %s", i.GuildID)
+	ch, err := getChannel(i.GuildID)
+	if err != nil {
+		log.Println("Error:", fmt.Errorf("check-notifications: %w", err))
+	}
+
+	var message string
+	if ch.NotificationsOn {
+		message = fmt.Sprintf("Notifications for server id: %s are enabled in channel: %s!", ch.GuildId, ch.ChannelId)
+	} else {
+		message = "Notifications are not enabled currently..."
+	}
+
+	respond(s, i, message)
 }

@@ -21,10 +21,8 @@ func main() {
 	// Initialize Discord Session
 	Session, err := bot.InitSession()
 	if err != nil {
-		log.Fatal(fmt.Errorf("Fatal: %w", err))
+		log.Fatal("Fatal:", fmt.Errorf("main: %w", err))
 	}
-
-	log.Println("Session initialized for", len(bot.C), "servers")
 
 	// Add init handler
 	Session.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
@@ -33,30 +31,32 @@ func main() {
 
 	// Open connection
 	if err = Session.Open(); err != nil {
-		log.Fatal(fmt.Errorf("Fatal: %w", err))
+		log.Fatal("Fatal:", fmt.Errorf("main: %w", err))
 	}
 	defer Session.Close()
+	log.Println("Session initialized for", len(*bot.C), "servers")
 
 	// Register commands
 	r, err := bot.RegisterCommands()
 	if err != nil {
-		log.Fatal(fmt.Errorf("Fatal: %w", err))
+		log.Fatal("Fatal:", fmt.Errorf("main: %w", err))
 	}
 	for _, c := range r {
 		log.Printf("Command registered: \"%s\" with id: %v", c.Name, c.ID)
 	}
 
+	// Setup Cron
 	if err = bot.SetupNotifications(); err != nil {
 		log.Println("Error: unable to send notification: %w", err)
 	}
 
 	// Continually fetch advent of code data every 15 minutes
-	for _, ch := range bot.C {
-		go func(channel data.Channel) {
+	for _, ch := range *bot.C {
+		go func(channel *data.Channel) {
 			for {
 				log.Println("Attempting to fetch data for leaderboard " + channel.Leaderboard + "...")
 				if err := data.FetchData(channel.Leaderboard, channel.SessionToken, channel.Leaderboard); err != nil {
-					log.Println(fmt.Errorf("Error: %w", err))
+					log.Println("Error:", fmt.Errorf("fetch: %w", err))
 				} else {
 					log.Println(channel.Leaderboard, "success!")
 				}
@@ -71,4 +71,6 @@ func main() {
 	signal.Notify(stop, os.Interrupt)
 	log.Println("Press Ctrl+C to exit")
 	<-stop
+
+	bot.TakeDown()
 }
