@@ -2,6 +2,7 @@ package bot
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -102,15 +103,20 @@ func InitSession() (*discordgo.Session, error) {
 		}
 	})
 
-	// Read channel configs from file (Not an ideal storage method...)
-	b, err := os.ReadFile("./channels.json")
-	if err != nil {
-		return nil, err
-	}
+	// Check for config file
+	if _, err := os.Stat("./channels.json"); errors.Is(err, os.ErrNotExist) {
+		log.Println("Info: no channel config file found")
+	} else {
+		// Read channel configs from file (Not an ideal storage method...)
+		b, err := os.ReadFile("./channels.json")
+		if err != nil {
+			return nil, err
+		}
 
-	// Populate channel info in local memory
-	if err = json.Unmarshal(b, &C); err != nil {
-		return nil, err
+		// Populate channel info in local memory
+		if err = json.Unmarshal(b, &C); err != nil {
+			return nil, err
+		}
 	}
 
 	s = S
