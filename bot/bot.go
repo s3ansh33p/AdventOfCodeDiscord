@@ -106,6 +106,8 @@ func InitSession() (*discordgo.Session, error) {
 	// Check for config file
 	if _, err := os.Stat("./channels.json"); errors.Is(err, os.ErrNotExist) {
 		log.Println("Info: no channel config file found")
+
+		*C = make(map[string]*data.Channel, 3)
 	} else {
 		// Read channel configs from file (Not an ideal storage method...)
 		b, err := os.ReadFile("./channels.json")
