@@ -26,8 +26,8 @@ type User struct {
 }
 
 type Day struct {
-	Silver Star `json:"1"`
-	Gold   Star `json:"2"`
+	Silver *Star `json:"1"`
+	Gold   *Star `json:"2"`
 }
 
 type Star struct {
