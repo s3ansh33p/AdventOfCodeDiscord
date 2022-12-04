@@ -52,9 +52,28 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	// Add users to embed
 	fields := make([]*discordgo.MessageEmbedField, 0)
 	for _, m := range M {
+		// Calculate avg. delta time.
+		daysFullyComplete := uint32(0)
+		deltaTimeSum := uint32(0)
+		for _, d := range m.CompletionDayLevel {
+			if d.Silver != nil && d.Gold != nil {
+				daysFullyComplete++
+				deltaTimeSum += d.Gold.Timestamp - d.Silver.Timestamp
+			}
+		}
+
+		var avgDeltaTime uint32 = 0
+		var avgDtimeS uint32 = 0
+		var avgDtimeM uint32 = 0
+		if daysFullyComplete != 0 {
+			avgDeltaTime = deltaTimeSum / daysFullyComplete
+			avgDtimeS = avgDeltaTime % 60
+			avgDtimeM = avgDeltaTime / 60
+		}
+
 		f := &discordgo.MessageEmbedField{
 			Name:  fmt.Sprintf("**%s**", m.Name),
-			Value: fmt.Sprintf("⭐ %d ⏳ %d", m.Stars, m.LocalScore),
+			Value: fmt.Sprintf("⭐ %d 🏆 %d ⏳ %d:%02d", m.Stars, m.LocalScore, avgDtimeM, avgDtimeS),
 		}
 		fields = append(fields, f)
 	}
