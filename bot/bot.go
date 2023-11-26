@@ -15,7 +15,7 @@ import (
 )
 
 var s *discordgo.Session
-var C *map[string]*data.Channel
+var C map[string]*data.Channel
 var crn *cron.Cron
 var adminPerm int64 = 0
 
@@ -108,7 +108,7 @@ func InitSession() (*discordgo.Session, error) {
 	if _, err := os.Stat("./channels.json"); errors.Is(err, os.ErrNotExist) {
 		log.Println("Info: no channel config file found")
 
-		*C = make(map[string]*data.Channel, 3)
+		C = make(map[string]*data.Channel, 3)
 	} else {
 		// Read channel configs from file (Not an ideal storage method...)
 		b, err := os.ReadFile("./channels.json")
@@ -127,6 +127,7 @@ func InitSession() (*discordgo.Session, error) {
 }
 
 func TakeDown() error {
+	log.Println("Shutting Down...")
 	crn.Stop()
 
 	// Save channel configurations

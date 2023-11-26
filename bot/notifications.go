@@ -14,7 +14,7 @@ func problemNotification() {
 	day := time.Now().AddDate(0, 0, 1).Day()
 
 	// For each registered channel
-	for _, ch := range *C {
+	for _, ch := range C {
 		if ch.NotificationsOn {
 			log.Println("Info: sending day", day, "notification in channel", ch.ChannelId)
 

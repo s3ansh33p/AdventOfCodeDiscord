@@ -126,7 +126,7 @@ func configure(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 
 	// Add to local memory
-	(*C)[i.GuildID] = &ch
+	C[i.GuildID] = &ch
 
 	// Write to file
 	b, err := json.Marshal(C)
