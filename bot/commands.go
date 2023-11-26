@@ -25,7 +25,7 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	channel, err := getChannel(i.GuildID)
 	if err != nil {
 		log.Println("Error:", fmt.Errorf("leaderboard: %v", err))
-		respondWithError(s, i, "Your server has not been correctly configured!")
+		respondWithError(s, i, "Your server has not been correctly configured! 🛠️ Use /configure-server")
 		return
 	}
 
@@ -142,6 +142,13 @@ func configure(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
+	log.Println("Attempting to fetch data for leaderboard " + ch.Leaderboard + "...")
+	if err := data.FetchData(ch.Leaderboard, ch.SessionToken, ch.Leaderboard); err != nil {
+		log.Println("Error:", fmt.Errorf("fetch: %w", err))
+	} else {
+		log.Println(ch.Leaderboard, "success!")
+	}
+
 	respond(s, i, "Server successfully configured!")
 }
 
@@ -151,7 +158,8 @@ func startCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	ch, err := getChannel(i.GuildID)
 	if err != nil {
 		log.Println("Error:", fmt.Errorf("start-notifications: %v", err))
-		respondWithError(s, i, "Error: Internal server error...")
+		respondWithError(s, i, "Your server has not been correctly configured! 🛠️ Use /configure-server")
+		return
 	}
 	ch.NotificationsOn = true
 
@@ -164,7 +172,8 @@ func stopCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	ch, err := getChannel(i.GuildID)
 	if err != nil {
 		log.Println("Error:", fmt.Errorf("start-notifications: %v", err))
-		respondWithError(s, i, "Error: Internal server error...")
+		respondWithError(s, i, "Your server has not been correctly configured! 🛠️ Use /configure-server")
+		return
 	}
 	ch.NotificationsOn = false
 
@@ -176,6 +185,8 @@ func checkCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	ch, err := getChannel(i.GuildID)
 	if err != nil {
 		log.Println("Error:", fmt.Errorf("check-notifications: %w", err))
+		respondWithError(s, i, "Your server has not been correctly configured! 🛠️ Use /configure-server")
+		return
 	}
 
 	var message string

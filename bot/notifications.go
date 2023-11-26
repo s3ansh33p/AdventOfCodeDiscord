@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ProblemUrl = "https://adventofcode.com/2022/day/"
+	ProblemUrl = "https://adventofcode.com/2023/day/"
 )
 
 func problemNotification() {
@@ -20,7 +20,7 @@ func problemNotification() {
 
 			// Create message object
 			messageString := fmt.Sprintf(
-				"🎄 <@&%s> 🎄\nThe problem for Day %d will be released soon! (<t:%d:R>)\nYou can see the problem statement here when its up: https://adventofcode.com/2022/day/%d",
+				"🎄 <@&%s> 🎄\nThe problem for Day %d will be released soon! (<t:%d:R>)\nYou can see the problem statement here when its up: https://adventofcode.com/2023/day/%d",
 				ch.RoleId,
 				day,
 				time.Now().Unix()+(int64(30)*60),
