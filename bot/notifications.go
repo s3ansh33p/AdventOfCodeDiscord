@@ -11,7 +11,7 @@ const (
 )
 
 func problemNotification() {
-	day := time.Now().AddDate(0, 0, 1).Day() - 1
+	day := time.Now().AddDate(0, 0, 1).Day()
 
 	// For each registered channel
 	for _, ch := range *C {
@@ -36,4 +36,12 @@ func problemNotification() {
 			log.Println("Info: notifications disabled for", ch.GuildId)
 		}
 	}
+}
+
+func NextNotification() (time.Time, error) {
+	entries := crn.Entries()
+	if len(entries) != 1 {
+		return time.Now(), fmt.Errorf("invalid number of cron entries")
+	}
+	return (*entries[0]).Next, nil
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"dustin-ward/AdventOfCodeBot/data"
 
@@ -153,7 +154,7 @@ func RegisterCommands() ([]*discordgo.ApplicationCommand, error) {
 }
 
 func SetupNotifications() error {
-	crn = cron.New()
+	crn = cron.NewWithLocation(time.UTC)
 
 	// Cronjob for 4:30am UTC (11:30pm EST)
 	if err := crn.AddFunc("0 30 4 * * *", problemNotification); err != nil {

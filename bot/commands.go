@@ -189,9 +189,17 @@ func checkCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
+	next, err := NextNotification()
+	if err != nil {
+		log.Println("Error:", fmt.Errorf("check-notifications: %w", err))
+		respondWithError(s, i, "Internal Error 💀 Please contact @shrublord")
+		return
+	}
+	day := time.Now().AddDate(0, 0, 1).Day()
+
 	var message string
 	if ch.NotificationsOn {
-		message = fmt.Sprintf("Notifications for server id: %s are enabled in channel: %s!", ch.GuildId, ch.ChannelId)
+		message = fmt.Sprintf("Notifications for server id: %s are enabled in channel: %s!\n\n⏰ Next notification: <t:%d:R> (Day %d)", ch.GuildId, ch.ChannelId, next.Unix(), day)
 	} else {
 		message = "Notifications are not enabled currently..."
 	}
