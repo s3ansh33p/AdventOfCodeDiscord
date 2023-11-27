@@ -155,10 +155,13 @@ func RegisterCommands() ([]*discordgo.ApplicationCommand, error) {
 }
 
 func SetupNotifications() error {
-	crn = cron.NewWithLocation(time.UTC)
-
-	// Cronjob for 4:30am UTC (11:30pm EST)
-	if err := crn.AddFunc("0 30 4 * * *", problemNotification); err != nil {
+	// Cronjob for 11:30pm EST
+	TO, err := time.LoadLocation("America/Toronto")
+	if err != nil {
+		return err
+	}
+	crn = cron.NewWithLocation(TO)
+	if err := crn.AddFunc("0 30 23 * * *", problemNotification); err != nil {
 		return err
 	}
 	crn.Start()
