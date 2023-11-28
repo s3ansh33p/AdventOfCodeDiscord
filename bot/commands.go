@@ -195,7 +195,7 @@ func checkCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		respondWithError(s, i, "Internal Error 💀 Please contact @shrublord")
 		return
 	}
-	day := time.Now().AddDate(0, 0, 1).Day()
+	day := next.AddDate(0, 0, 1).Day()
 
 	var message string
 	if ch.NotificationsOn {
