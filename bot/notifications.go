@@ -11,7 +11,7 @@ const (
 )
 
 func problemNotification() {
-	day := time.Now().AddDate(0, 0, 1).Day()
+	day := time.Now().Day()
 
 	// For each registered channel
 	for _, ch := range C {
