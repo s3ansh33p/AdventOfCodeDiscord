@@ -17,6 +17,7 @@ A discord bot written in Go to provide leaderboards and nightly notifications to
 `/check-notifications` - Check your servers current notification status
 
 ## Deployment
+
 ### Using Golang
 Ensure you have go installed and run the bot by doing:
 ```sh
