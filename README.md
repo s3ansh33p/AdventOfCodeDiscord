@@ -2,6 +2,18 @@
 
 A discord bot written in Go to provide leaderboards and nightly notifications to your server!
 
+## Installation
+
+### Self Hosting
+
+1. Set `$AOC_BOT_TOKEN` to discord bot secret token
+
+2. `go run main.go`
+
+### Docker
+
+
+
 ## Usage 
 
 ### General
@@ -15,3 +27,4 @@ A discord bot written in Go to provide leaderboards and nightly notifications to
 `/stop-notifications` - Unsubscribe from nightly notifications
 
 `/check-notifications` - Check your servers current notification status
+
