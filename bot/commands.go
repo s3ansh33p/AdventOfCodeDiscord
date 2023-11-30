@@ -12,12 +12,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func helloworld(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	log.Printf("Info: command \"helloworld\" executed from guildId: %s", i.GuildID)
-
-	respond(s, i, "Hello from the AoC bot 🙂")
-}
-
 func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	log.Printf("Info: command \"leaderboard\" executed from guildId: %s", i.GuildID)
 
