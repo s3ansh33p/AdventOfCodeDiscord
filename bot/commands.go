@@ -143,7 +143,7 @@ func configure(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		log.Println(ch.Leaderboard, "success!")
 	}
 
-	respond(s, i, "Server successfully configured!")
+	respond(s, i, "Server successfully configured!", true)
 }
 
 func startCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -157,7 +157,7 @@ func startCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 	ch.NotificationsOn = true
 
-	respond(s, i, "Notification process started! ⏰")
+	respond(s, i, "Notification process started! ⏰", false)
 }
 
 func stopCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -171,7 +171,7 @@ func stopCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 	ch.NotificationsOn = false
 
-	respond(s, i, "Notification process stopped! ⏸")
+	respond(s, i, "Notification process stopped! ⏸", false)
 }
 
 func checkCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -198,5 +198,5 @@ func checkCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		message = "Notifications are not enabled currently..."
 	}
 
-	respond(s, i, message)
+	respond(s, i, message, false)
 }
