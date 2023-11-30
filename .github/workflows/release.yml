@@ -3,14 +3,14 @@ name: CI for releases
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # Triggers only if a tag starting with a v is created (e.g. v1.1.2)
 
 jobs:
-  build-and-push-docker-image:
+  build-and-push-docker-image: # This workflow build a docker image of the project, create an image on ghcr.io and publish a release to the repository
     runs-on: ubuntu-latest
     permissions:
-      contents: write # github.com/kalitsune/open-discord-translator/releases
-      packages: write # ghcr.io/kalitsune/open-discord-translator:latest
+      contents: write # github.com/dustin-ward/AdventOfCodeDiscord/releases
+      packages: write # ghcr.io/dustin-ward/AdventOfCodeDiscord/:latest
     env:
       IMAGE_NAME: "advent-of-code-discord" # can't contain uppercases
     steps:
