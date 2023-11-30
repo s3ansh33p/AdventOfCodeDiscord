@@ -90,7 +90,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 
 func InitSession() (*discordgo.Session, error) {
 	// Init discordgo session
-	S, err := discordgo.New("Bot " + BotToken)
+	S, err := discordgo.New("Bot " + os.Getenv("TOKEN"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid bot configuration: %w", err)
 	}

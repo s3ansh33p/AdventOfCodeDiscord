@@ -15,3 +15,9 @@ A discord bot written in Go to provide leaderboards and nightly notifications to
 `/stop-notifications` - Unsubscribe from nightly notifications
 
 `/check-notifications` - Check your servers current notification status
+
+## Deployment
+Ensure you have go installed and run the bot by doing:
+```sh
+TOKEN="[Your token here]" go run main.go
+```
