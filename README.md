@@ -30,6 +30,5 @@ docker volume create discord-aoc-bot
 ```
 then run the bot by doing:
 ```sh
-docker run -v discord-aoc-bot:/app/ --rm -e TOKEN="[Your token here]" discord-aoc-bot
-
+docker run -v discord-aoc-bot:/app/ --rm -e TOKEN="[Your token here]" ghcr.io/dustin-ward/advent-of-code-discord:latest
 ```
