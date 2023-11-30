@@ -81,7 +81,6 @@ var commands = []*discordgo.ApplicationCommand{
 // Command handlefuncs
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 	"leaderboard":         leaderboard,
-	"hello-world":         helloworld,
 	"configure-server":    configure,
 	"start-notifications": startCountdown,
 	"stop-notifications":  stopCountdown,
