@@ -89,8 +89,14 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 }
 
 func InitSession() (*discordgo.Session, error) {
+	// Get token
+	token := os.Getenv("AOC_BOT_TOKEN")
+	if token == "" {
+		return nil, fmt.Errorf("no discord token found. Please set $AOC_BOT_TOKEN")
+	}
+
 	// Init discordgo session
-	S, err := discordgo.New("Bot " + BotToken)
+	S, err := discordgo.New("Bot " + token)
 	if err != nil {
 		return nil, fmt.Errorf("invalid bot configuration: %w", err)
 	}
