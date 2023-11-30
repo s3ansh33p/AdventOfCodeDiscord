@@ -21,7 +21,7 @@ A discord bot written in Go to provide leaderboards and nightly notifications to
 ### Using Golang
 Ensure you have go installed and run the bot by doing:
 ```sh
-TOKEN="[Your token here]" go run main.go
+AOC_BOT_TOKEN="[Your token here]" go run main.go
 ```
 
 ### Using Docker
@@ -31,5 +31,5 @@ docker volume create discord-aoc-bot
 ```
 then run the bot by doing:
 ```sh
-docker run -v discord-aoc-bot:/app/ --rm -e TOKEN="[Your token here]" ghcr.io/dustin-ward/advent-of-code-discord:latest
+docker run -v discord-aoc-bot:/app/ --rm -e AOC_BOT_TOKEN="[Your token here]" ghcr.io/dustin-ward/advent-of-code-discord:latest
 ```

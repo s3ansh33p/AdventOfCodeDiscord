@@ -17,16 +17,16 @@ func getChannel(guildId string) (*data.Channel, error) {
 }
 
 func respond(s *discordgo.Session, i *discordgo.InteractionCreate, message string, ephemeral bool) {
-    var flags discordgo.MessageFlags
-    if ephemeral {
-        flags |= discordgo.MessageFlagsEphemeral
-    }
+	var flags discordgo.MessageFlags
+	if ephemeral {
+		flags |= discordgo.MessageFlagsEphemeral
+	}
 
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: message,
-            Flags: flags,
+			Flags:   flags,
 		},
 	})
 	if err != nil {
