@@ -34,3 +34,10 @@ then run the bot by doing:
 ```sh
 docker run -v discord-aoc-bot:/app/ --rm -e AOC_BOT_TOKEN="[Your token here]" ghcr.io/dustin-ward/advent-of-code-discord:latest
 ```
+
+### Using kubernetes
+A [template file](./aoc-discord-bot.yml) is provided in this repository.
+Complete it then run:
+```sh
+kubectl apply -f ./aoc-discord-bot.yml
+```
