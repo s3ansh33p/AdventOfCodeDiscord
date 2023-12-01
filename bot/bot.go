@@ -18,6 +18,7 @@ var s *discordgo.Session
 var C map[string]*data.Channel
 var crn *cron.Cron
 var adminPerm int64 = 0
+var dataDir string = os.Getenv("DATA_DIR");
 
 // Command definitions
 var commands = []*discordgo.ApplicationCommand{
@@ -110,13 +111,13 @@ func InitSession() (*discordgo.Session, error) {
 	})
 
 	// Check for config file
-	if _, err := os.Stat("./channels.json"); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(dataDir + "channels.json"); errors.Is(err, os.ErrNotExist) {
 		log.Println("Info: no channel config file found")
 
 		C = make(map[string]*data.Channel, 3)
 	} else {
 		// Read channel configs from file (Not an ideal storage method...)
-		b, err := os.ReadFile("./channels.json")
+		b, err := os.ReadFile(dataDir + "channels.json")
 		if err != nil {
 			return nil, err
 		}
@@ -140,7 +141,7 @@ func TakeDown() error {
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile("./channels.json", b, 0777); err != nil {
+    if err = os.WriteFile(dataDir + "channels.json", b, 0777); err != nil {
 		return err
 	}
 

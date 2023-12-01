@@ -137,7 +137,7 @@ func configure(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	if err := os.WriteFile("./channels.json", b, 0777); err != nil {
+	if err := os.WriteFile(dataDir + "channels.json", b, 0777); err != nil {
 		log.Println("Error:", fmt.Errorf("configure: %v", err))
 		respondWithError(s, i, "Error: Internal server error...")
 		return

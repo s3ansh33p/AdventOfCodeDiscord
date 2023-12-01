@@ -18,6 +18,11 @@ const (
 )
 
 func main() {
+    // Setup the default values for the environment variables
+    if os.Getenv("DATA_DIR") == "" {
+        os.Setenv("DATA_DIR", "./")
+    }
+
 	// Initialize Discord Session
 	Session, err := bot.InitSession()
 	if err != nil {
