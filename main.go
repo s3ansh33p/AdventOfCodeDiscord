@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+    "strings"
 
 	"dustin-ward/AdventOfCodeBot/bot"
 	"dustin-ward/AdventOfCodeBot/data"
@@ -21,6 +22,11 @@ func main() {
     // Setup the default values for the environment variables
     if os.Getenv("DATA_DIR") == "" {
         os.Setenv("DATA_DIR", "./")
+    }
+    
+    // Avoid most user indused errors due to an incorrect path.
+    if !strings.HasSuffix(os.Getenv("DATA_DIR"), "/") {
+        os.Setenv("DATA_DIR", os.Getenv("DATA_DIR") + "/")
     }
 
 	// Initialize Discord Session
