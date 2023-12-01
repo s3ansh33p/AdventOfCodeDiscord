@@ -18,7 +18,7 @@ var s *discordgo.Session
 var C map[string]*data.Channel
 var crn *cron.Cron
 var adminPerm int64 = 0
-var dataDir string = os.Getenv("DATA_DIR");
+var dataDir string = os.Getenv("DATA_DIR")
 
 // Command definitions
 var commands = []*discordgo.ApplicationCommand{
@@ -141,7 +141,7 @@ func TakeDown() error {
 	if err != nil {
 		return err
 	}
-    if err = os.WriteFile(dataDir + "channels.json", b, 0777); err != nil {
+	if err = os.WriteFile(dataDir+"channels.json", b, 0777); err != nil {
 		return err
 	}
 

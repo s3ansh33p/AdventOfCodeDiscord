@@ -12,7 +12,7 @@ const (
 	AocURL = "https://adventofcode.com/2023/leaderboard/private/view/"
 )
 
-var dataDir string = os.Getenv("DATA_DIR");
+var dataDir string = os.Getenv("DATA_DIR")
 
 func GetData(boardId string) (*Data, error) {
 	b, err := os.ReadFile(dataDir + boardId + ".json")
@@ -51,7 +51,7 @@ func FetchData(boardId, sessionToken, writePath string) error {
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(dataDir + writePath+".json", body, 0777); err != nil {
+	if err = os.WriteFile(dataDir+writePath+".json", body, 0777); err != nil {
 		return err
 	}
 
