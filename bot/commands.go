@@ -71,9 +71,16 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		}
 		fields = append(fields, f)
 	}
-	fields[0].Name += " 🥇"
-	fields[1].Name += " 🥈"
-	fields[2].Name += " 🥉"
+
+	if len(M) > 0 {
+		fields[0].Name += " 🥇"
+	}
+	if len(M) > 1 {
+		fields[1].Name += " 🥈"
+	}
+	if len(M) > 2 {
+		fields[2].Name += " 🥉"
+	}
 
 	// Create embed object
 	embeds := make([]*discordgo.MessageEmbed, 1)
