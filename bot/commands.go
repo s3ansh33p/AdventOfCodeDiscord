@@ -27,11 +27,11 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	D, err := data.GetData(channel.Leaderboard)
 	if err != nil {
 		log.Println("Error:", fmt.Errorf("leaderboard: %v", err))
-		respondWithError(s, i, "An internal error occured...")
+		respondWithError(s, i, "An internal error occurred...")
 		return
 	}
 
-	// Sort users by stars and localscore
+	// Sort users by stars and local score
 	M := make([]data.User, 0)
 	for _, m := range D.Members {
 		M = append(M, m)
@@ -85,12 +85,12 @@ func leaderboard(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	// Create embed object
 	embeds := make([]*discordgo.MessageEmbed, 1)
 	embeds[0] = &discordgo.MessageEmbed{
-		URL:   "https://adventofcode.com/2023/leaderboard/private/view/" + channel.Leaderboard,
+		URL:   "https://adventofcode.com/2024/leaderboard/private/view/" + channel.Leaderboard,
 		Type:  discordgo.EmbedTypeRich,
-		Title: "🎄 2023 Leaderboard 🎄",
+		Title: "🎄 2024 Leaderboard 🎄",
 		Color: 0x127C06,
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: "Leaderboard as of " + time.Now().Format("2006/01/02 3:4:5pm"),
+			Text: "Leaderboard as of " + time.Now().Format("2006/01/02 15:04pm"),
 		},
 		Fields: fields,
 	}
@@ -193,7 +193,7 @@ func checkCountdown(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	next, err := NextNotification()
 	if err != nil {
 		log.Println("Error:", fmt.Errorf("check-notifications: %w", err))
-		respondWithError(s, i, "Internal Error 💀 Please contact @shrublord")
+		respondWithError(s, i, "Internal Error 💀 Please contact @s3ansh33p")
 		return
 	}
 	day := next.AddDate(0, 0, 1).Day()

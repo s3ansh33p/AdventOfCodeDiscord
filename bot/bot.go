@@ -23,11 +23,6 @@ var dataDir string = os.Getenv("DATA_DIR")
 // Command definitions
 var commands = []*discordgo.ApplicationCommand{
 	{
-		Name:                     "hello-world",
-		Description:              "For testing purposes",
-		DefaultMemberPermissions: &adminPerm,
-	},
-	{
 		Name:        "leaderboard",
 		Description: "Current Leaderboard",
 	},
@@ -74,7 +69,7 @@ var commands = []*discordgo.ApplicationCommand{
 	},
 	{
 		Name:                     "check-notifications",
-		Description:              "Check to see if notificatiosn are currently enabled",
+		Description:              "Check to see if notifications are currently enabled",
 		DefaultMemberPermissions: &adminPerm,
 	},
 }

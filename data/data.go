@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	AocURL = "https://adventofcode.com/2023/leaderboard/private/view/"
+	AocURL = "https://adventofcode.com/2024/leaderboard/private/view/"
 )
 
 var dataDir string = os.Getenv("DATA_DIR")
